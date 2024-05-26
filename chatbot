@@ -1,0 +1,54 @@
+# app.py
+
+from flask import Flask, request, jsonify
+import os
+from dotenv import load_dotenv
+from pi_blockchain import PiBlockchain
+
+# Load environment variables
+load_dotenv()
+
+# Initialize the Flask application
+app = Flask(__name__)
+
+# Initialize the Pi blockchain client
+pi_blockchain = PiBlockchain(api_key=os.getenv('pmrzu8uvs6q5rfhnokx8ksazwqasgxcydd3mb6tzg3lykivglkmmcje0rxudfugv'))
+
+# Route to start a new philosophical discussion
+@app.route('/start_discussion', methods=['POST'])
+def start_discussion():
+    data = request.json
+    question = data.get('question')
+    if not question:
+        return jsonify({"error": "Question is required"}), 400
+    
+    # Logic to start the discussion between AI chatbots
+    response = pi_blockchain.start_discussion(question)
+    
+    return jsonify(response)
+
+# Route to place a wager on the discussion
+@app.route('/place_wager', methods=['POST'])
+def place_wager():
+    data = request.json
+    wager = data.get('wager')
+    discussion_id = data.get('discussion_id')
+    if not wager or not discussion_id:
+        return jsonify({"error": "Wager and Discussion ID are required"}), 400
+    
+    # Logic to place the wager on the discussion
+    response = pi_blockchain.place_wager(discussion_id, wager)
+    
+    return jsonify(response)
+
+# Route to retrieve chat history
+@app.route('/chat_history/<discussion_id>', methods=['GET'])
+def chat_history(discussion_id):
+    # Logic to retrieve chat history from the Pi blockchain
+    history = pi_blockchain.get_chat_history(discussion_id)
+    
+    return jsonify(history)
+
+# Main function to run the Flask app
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
